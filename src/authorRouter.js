@@ -4,11 +4,6 @@ import { Author } from './models/authors.js'
 const authorRouter = express.Router();
 
 
-// Test per provare l'endpoint
-authorRouter.get("/test", async (req, res) => {
-    res.json({ message: "Authors router working!" });
-});
-
 // Metodo 'GET' per effettuare una richiesta di TUTTI gli autori
 authorRouter.get('/', async (req, res) => {
     const authors = await Author.find({})
@@ -18,14 +13,20 @@ authorRouter.get('/', async (req, res) => {
 
 // Metodo 'GET' per effettuare una richiesta di un SOLO autore specifico
 authorRouter.get('/:id', async (req, res) => {
-    const { id } = req.params
-    const author = await Author.findById({ id })
+    try {
+        const { id } = req.params
+        const author = await Author.findById(id)
 
-    if (!author) {
-        return res.status(404).send()
+
+        if (!author) {
+            return res.status(404).send()
+        }
+        res.json(author)
+    } catch (error) {
+        console.log(error)
     }
 
-    res.json(author)
+
 })
 
 
@@ -35,20 +36,34 @@ authorRouter.post('/', async (req, res) => {
         const newAuthor = new Author(req.body);
         await newAuthor.save();
         res.status(200).send(newAuthor)
-    } catch(error){
+    } catch (error) {
         console.log(error)
         res.status(400).send(error)
     }
-    
+
 })
 
 
 // Metodo 'PUT' per MODIFICARE un autore
-authorRouter.put('/:id', async(req, res) => {
-    try{
-        const {id} = req.params
+authorRouter.put('/:id', async (req, res) => {
+    try {
+        const { id } = req.params
         const authors = await Author.findByIdAndUpdate(id)
-        if(!authors){
+        if (!authors) {
+            return res.status(404).send()
+        }
+    } catch (error) {
+        console.log(error)
+        req.status(400).send(error)
+    }
+})
+
+// Metodo 'DELETE' per ELIMINARE un autore
+authorRouter.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        const author = await Author.findByIdAndDelete(id)
+        if (!author) {
             return res.status(404).send()
         }
     } catch (error) {
