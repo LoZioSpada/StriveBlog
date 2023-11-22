@@ -7,10 +7,8 @@ const apiRouter = express.Router()
 
 apiRouter.use(express.json())
 
-apiRouter.use('/authors', authorRouter)
-
 apiRouter.use(cors())
 
-apiRouter.options('*', cors())
+apiRouter.use('/authors', authorRouter)
 
 export default apiRouter
