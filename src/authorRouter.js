@@ -48,7 +48,7 @@ authorRouter.post('/', async (req, res) => {
 authorRouter.put('/:id', async (req, res) => {
     try {
         const { id } = req.params
-        const authors = await Author.findByIdAndUpdate(id)
+        const authors = await Author.findByIdAndUpdate(id, req.body, {new: true})
         if (!authors) {
             return res.status(404).send()
         }
