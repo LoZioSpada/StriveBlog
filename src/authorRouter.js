@@ -1,5 +1,6 @@
 import express from "express";
 import { Author } from './models/authors.js'
+import { BlogPost } from "./models/blogPost.js";
 
 const authorRouter = express.Router();
 
@@ -27,6 +28,23 @@ authorRouter.get('/:id', async (req, res) => {
     }
 
 
+})
+
+
+// Metodo 'GET' per ritornare tutti i post di un autore specifico
+authorRouter.get('/:id/blogPosts', async(req, res) => {
+    try{
+        const { id } = req.params
+        const author = await Author.findById(id)
+        if(!author){
+            return res.status(404).json({ messaggio: 'Autore non trovato' })
+        }
+        const blogPosts = await BlogPost.find({ 'author._id': id })
+        res.json(blogPosts)
+    } catch(error){
+        console.log(error)
+        req.status(400).send(error)
+    }
 })
 
 
@@ -71,5 +89,6 @@ authorRouter.delete('/:id', async (req, res) => {
         req.status(400).send(error)
     }
 })
+
 
 export default authorRouter
