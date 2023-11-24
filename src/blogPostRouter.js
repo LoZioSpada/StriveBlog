@@ -29,20 +29,41 @@ blogPostRouter.get('/:id', async (req, res) => {
             return res.status(404).send()
         }
         req.json(blogPost)
-    } catch (error){
+    } catch (error) {
         console.log(error)
         res.status(404).send()
     }
 })
 
 
+// Metodo 'GET' per filtrare i post tramite il nome del titolo del post
+blogPostRouter.get('/blogPosts?title=', async (req, res) => {
+    try {
+        const { title } = req.params
+        const titleQuery = req.query
+
+        if (!titleQuery(title)) {
+            return res.status(400).json({ messaggio: 'Parametro "title" obbligatorio' })
+        }
+
+        const blogPost = await BlogPost.find({
+            title: { $regex: titleQuery(title), $options: 'i' },
+        })
+        res.json({ blogPost })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ messaggio: 'Errore server!'})
+    }
+})
+
+
 // Metodo 'POST' per AGGIUNGERE un nuovo post
 blogPostRouter.post('/', async (req, res) => {
-    try{
+    try {
         const newPost = new BlogPost(req.body)
         await newPost.save()
         res.status(201).send(newPost)
-    } catch(error){
+    } catch (error) {
         console.log(error)
         req.status(500).send(error)
     }
@@ -50,32 +71,32 @@ blogPostRouter.post('/', async (req, res) => {
 
 
 // Metodo 'PUT' per MODIFICARE un post
-blogPostRouter.put('/:id', async(req, res) => {
-    try{
+blogPostRouter.put('/:id', async (req, res) => {
+    try {
         const { id } = req.params
         const updatePost = await BlogPost.findByIdAndUpdate(id, req.body, { new: true })
-        if(!updatePost){
+        if (!updatePost) {
             return res.status(404).send()
         }
         res.json(updatePost)
 
-    } catch(error){
+    } catch (error) {
         console.log(error)
         req.status(400).send(error)
     }
-    
+
 })
 
 
 // Metodo 'DELETE' per ELIMINARE un post
-blogPostRouter.delete('/:id', async(req, res) => {
-    try{
+blogPostRouter.delete('/:id', async (req, res) => {
+    try {
         const { id } = req.params
         const deletePost = await BlogPost.findByIdAndDelete(id)
-        if(!deletePost){
+        if (!deletePost) {
             return res.status(404).send()
-        } 
-    } catch(error){
+        }
+    } catch (error) {
         console.log(error)
         req.status(400).send()
     }
