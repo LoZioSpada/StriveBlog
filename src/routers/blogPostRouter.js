@@ -1,5 +1,5 @@
 import express, { response } from 'express';
-import { BlogPost } from './models/blogPost.js'
+import { BlogPost } from '../models/blogPost.js'
 
 const blogPostRouter = express.Router()
 
@@ -101,5 +101,8 @@ blogPostRouter.delete('/:id', async (req, res) => {
         req.status(400).send()
     }
 })
+
+// QUI ANDRANNO LE ROTTE PER I COMMENTI
+
 
 export default blogPostRouter

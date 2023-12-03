@@ -2,6 +2,7 @@
 import express from 'express'
 import apiRouter from './apiRouter.js'
 import mongoose from 'mongoose'
+import { genericError } from './middlewares/genericError.js'
 
 const server = express()
 
@@ -10,6 +11,9 @@ const port = 3030
 
 // La sotto-directory /api
 server.use("/api", apiRouter)
+
+// Gesitone di un errore generico
+server.use(genericError)
 
 // Connessione al database con mongoose
 mongoose

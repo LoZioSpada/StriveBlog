@@ -1,6 +1,6 @@
 import express from "express";
-import { Author } from './models/authors.js'
-import { BlogPost } from "./models/blogPost.js";
+import { Author } from '../models/authors.js'
+import { BlogPost } from "../models/blogPost.js";
 
 const authorRouter = express.Router();
 
