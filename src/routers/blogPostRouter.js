@@ -1,5 +1,6 @@
 import express, { response } from 'express';
 import { BlogPost } from '../models/blogPost.js'
+import { Comment } from '../models/comments.js'
 
 const blogPostRouter = express.Router()
 
@@ -104,5 +105,101 @@ blogPostRouter.delete('/:id', async (req, res) => {
 
 // QUI ANDRANNO LE ROTTE PER I COMMENTI
 
+
+// 'GET' PER RITORNARE TUTTI I COMMENTI DI UN POST SPECIFICO
+.get("/:id/comments", async (req, res, next) => {
+    try{
+        const comments = await BlogPost.findById(req.params.id)
+        .populate("comments author")
+        .select("comments -_id")
+
+        if(!comments){
+            return res.status(404).send()
+        }
+        res.json(comments)
+    } catch(error){
+        console.log(error)
+        res.status(400).send(error)
+    }
+})
+
+
+// 'GET' PER ANDARE A RITORNARE UN COMMENTO SPECIFICO DI UN POST SPECIFICO
+.get('/:id/comments/:commentId', async (req, res, next) => {
+    try{
+        const blogPost = await BlogPost.findById(req.params.id);
+        const comments = await Comment.findById(req.params.commentId)
+
+        if(!blogPost){
+            return res.status(404).send()
+        } else if(!comments){
+            return res.status(404).send()
+        }
+        res.json(comment)
+    } catch(error){
+        console.log(error)
+        res.status(400).send()
+    }
+})
+
+
+// 'POST' PER AGGIUNGERE UN NUOVO COMMENTO AD UN POST
+.post("/:id", async(req, res, next) => {
+    try{
+        const blogPost = await BlogPost.findById(req.params.id)
+        if(!blogPost){
+            return res.status(404).send()
+        }
+        const newComment = new Comment(req.body)
+        blogPost.comments.push(newComment)
+        await newComment.save()
+        await blogPost.save()
+        res.status(201).send(newComment)
+    } catch(error){
+        console.log(error)
+        res.status(400).send(error)
+    }
+})
+
+
+// 'PUT' PER MODIFICARE UN COMMENTO SPECIFICO
+.put('/:id/comments/:commentId', async (req, res, next) => {
+    try{
+        const blogPost = await BlogPost.findById(req.params.id)
+        const updateComment = await Comment.findByIdAndUpdate(
+            req.params.commentId,
+            req.body,+
+            { new: true }
+        )
+        if(!blogPost){
+            return res.status(404).send()
+        } else if(!updateComment) {
+            return res.status(404).send()
+        }
+        res.json(updateComment)
+    } catch(error){
+        console.log(error)
+        res.status(400).send(error)
+    }
+})
+
+
+// 'DELETE' PER CANCELLARE UN COMMENTO
+.delete('/:id/comments/:commentId', async (req, res, next) => {
+    try{
+        const blogPost = await BlogPost.findById(req.params.id)
+        const deletedComment = await Comment.findByIdAndDelete(req.params.commentId)
+        if(!blogPost){
+            return res.status(404).send()
+        } else if (!deletedComment){
+            return res.status(404).send()
+        } else {
+            res.status(204).send()
+        }
+    } catch(error){
+        console.log(error)
+        res.status(400).send(error)
+    }
+})
 
 export default blogPostRouter
